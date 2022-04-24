@@ -18,8 +18,8 @@ def create_dataframe(data):
     return json_to_dataframe(data)
 
 
-def generate_csv(df):
-    df.to_csv("data.csv")
+def generate_csv(df, filename):
+    df.to_csv("output/" + filename + ".csv")
 
 
 def cross_join(left, right):
@@ -62,6 +62,8 @@ def main():
     for file in os.listdir("data"):
         data = read_json("data/" + file)
         df = create_dataframe(data)
-        generate_csv(df)
+        f_name, f_ext = os.path.splitext(file)
+        generate_csv(df, f_name)
+
 
 main()
