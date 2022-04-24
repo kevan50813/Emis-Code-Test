@@ -44,7 +44,7 @@ def write_to_csv(data, filepath):
 
 def main():
     for file in os.listdir("data"):
-        data = read_json(file)
+        data = read_json("data/" + file)
         flat_data = flatten_json(data)
         csv_data = generate_csv_data(flat_data)
         write_to_csv(csv_data, "data.csv")
