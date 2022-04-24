@@ -1,5 +1,7 @@
 import json
 import os
+import pandas
+from copy import deepcopy
 
 
 def read_json(filename):
@@ -12,42 +14,54 @@ def read_json(filename):
     return data
 
 
-def flatten_json(data):
-    d = dict()
-    for key, value in data.items():
-        if not isinstance(value, dict):
-            d[key] = value
+def create_dataframe(data):
+    return json_to_dataframe(data)
+
+
+def generate_csv(df):
+    df.to_csv("data.csv")
+
+
+def cross_join(left, right):
+    new_rows = [] if right else left
+    for left_row in left:
+        for right_row in right:
+            temp_row = deepcopy(left_row)
+            for key, value in right_row.items():
+                temp_row[key] = value
+            new_rows.append(deepcopy(temp_row))
+    return new_rows
+
+
+def flatten_list(data):
+    for elem in data:
+        if isinstance(elem, list):
+            yield from flatten_list(elem)
         else:
-            for k, v in value.items():
-                d[key + "_" + k] = v
-    return d
+            yield elem
 
 
-def generate_csv_data(data):
-    collumns = data.keys()
-    csv_data = ",".join(collumns) + "\n"
-    row = list()
-    for col in collumns:
-        row.append(str(data[col]))
+def json_to_dataframe(data_in):
+    def flatten_json(data, prev_heading=''):
+        if isinstance(data, dict):
+            rows = [{}]
+            for key, value in data.items():
+                rows = cross_join(rows, flatten_json(value, prev_heading + '.' + key))
+        elif isinstance(data, list):
+            rows = []
+            for item in data:
+                [rows.append(elem) for elem in flatten_list(flatten_json(item, prev_heading))]
+        else:
+            rows = [{prev_heading[1:]: data}]
+        return rows
 
-    csv_data += ",".join(row) + "\n"
-    return csv_data
-
-
-def write_to_csv(data, filepath):
-    try:
-        with open(filepath, "w+") as f:
-            f.write(data)
-    except:
-        raise Exception(f"Error when wrtring to file form {filepath}")
+    return pandas.DataFrame(flatten_json(data_in))
 
 
 def main():
     for file in os.listdir("data"):
         data = read_json("data/" + file)
-        flat_data = flatten_json(data)
-        csv_data = generate_csv_data(flat_data)
-        write_to_csv(csv_data, "data.csv")
-
+        df = create_dataframe(data)
+        generate_csv(df)
 
 main()
