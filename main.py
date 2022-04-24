@@ -2,7 +2,7 @@ import json
 import os
 
 
-def read_json(filename: str) -> dir:
+def read_json(filename):
     try:
         with open(filename, "r") as f:
             data = json.loads(f.read())
@@ -12,7 +12,7 @@ def read_json(filename: str) -> dir:
     return data
 
 
-def flatten_json(data: dict) -> dict:
+def flatten_json(data):
     d = dict()
     for key, value in data.items():
         if not isinstance(value, dict):
@@ -23,7 +23,7 @@ def flatten_json(data: dict) -> dict:
     return d
 
 
-def generate_csv_data(data: dict) -> str:
+def generate_csv_data(data):
     collumns = data.keys()
     csv_data = ",".join(collumns) + "\n"
     row = list()
@@ -32,3 +32,22 @@ def generate_csv_data(data: dict) -> str:
 
     csv_data += ",".join(row) + "\n"
     return csv_data
+
+
+def write_to_csv(data, filepath):
+    try:
+        with open(filepath, "w+") as f:
+            f.write(data)
+    except:
+        raise Exception(f"Error when wrtring to file form {filepath}")
+
+
+def main():
+    for file in os.listdir("data"):
+        data = read_json(file)
+        flat_data = flatten_json(data)
+        csv_data = generate_csv_data(flat_data)
+        write_to_csv(csv_data, "data.csv")
+
+
+main()
