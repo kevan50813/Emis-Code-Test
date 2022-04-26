@@ -21,6 +21,7 @@ def generate_csv(df):
     df.to_csv("output.csv")
 
 
+# custom cross join function
 def cross_join(left, right):
     rows = [] if right else left
     for left_row in left:
