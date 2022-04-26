@@ -17,8 +17,8 @@ def read_json(filename):
 
 
 # turn the output into a csv in the output folder there is one csv for each JSON
-def generate_csv(df, filename):
-    df.to_csv("output/" + filename + ".csv")
+def generate_csv(df):
+    df.to_csv("output.csv")
 
 
 def cross_join(left, right):
@@ -69,7 +69,7 @@ def main():
         data = read_json("data/" + file)
         df = create_dataframe(data)
         f_name, f_ext = os.path.splitext(file)
-        generate_csv(df, f_name)
+        generate_csv(df)
         f_et = datetime.datetime.now()
         f_exe_time = f_et - f_st
         print('Execution time for file', f_name, ':', f_exe_time, 'seconds')
